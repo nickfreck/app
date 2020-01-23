@@ -165,17 +165,6 @@ resource "aws_subnet" "app_rds2_subnet" {
   }
 }
 
-resource "aws_subnet" "app_rds3_subnet" {
-  vpc_id                  = aws_vpc.app_vpc.id
-  cidr_block              = var.cidrs["rds3"]
-  map_public_ip_on_launch = false
-  availability_zone       = data.aws_availability_zones.available.names[2]
-
-  tags = {
-    Name = "app_rds3"
-  }
-}
-
 # RDS subnet group
 
 resource "aws_db_subnet_group" "app_rds_subnetgroup" {
@@ -183,7 +172,6 @@ resource "aws_db_subnet_group" "app_rds_subnetgroup" {
 
    subnet_ids = ["${aws_subnet.app_rds1_subnet.id}",
      "${aws_subnet.app_rds2_subnet.id}",
-     "${aws_subnet.app_rds3_subnet.id}"
    ]
 
    tags = {
@@ -218,13 +206,15 @@ resource "aws_route_table_association" "app_private2_assoc" {
 resource "aws_security_group" "app_dev_sg" {
    name = "app_dev_sg"
    description = "Used for access to the dev instance"
-   vpc_id = "${aws_vpc.app_vpc.id}"
+   vpc_id = "aws_vpc.app_vpc.id"
 
    #SSH
 
    ingress {
       from_port = 22
       to_port =22
+      protocol = "ssh"
+      cidr_blocks = ["${var.localip}"]
    }
    
    #HTTP
@@ -233,7 +223,7 @@ resource "aws_security_group" "app_dev_sg" {
       from_port = 80
       to_port = 80
       protocol = "tcp"
-      cidr_blocks = ["${var.localip}"]  
+      cidr_blocks = ["${var.localip}"]
    }
 
    egress {
@@ -242,3 +232,4 @@ resource "aws_security_group" "app_dev_sg" {
       protocol = "-1"
       cidr_blocks = ["0.0.0.0/0"]
    }
+}
