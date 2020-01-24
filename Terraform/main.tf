@@ -175,7 +175,7 @@ resource "aws_db_subnet_group" "app_rds_subnetgroup" {
    ]
 
    tags = {
-      Name = "wp_rds_sng"
+      Name = "app_rds_sng"
   }
 }
 
